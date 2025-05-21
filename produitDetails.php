@@ -125,7 +125,19 @@ function getProductDetails($productId) {
     }
 
     // URL de l'image par défaut
-    $productImage = !empty($imageUrls) ? $imageUrls[0] : "";
+    $productImage = "";
+    if (!empty($imageUrls)) {
+        $imageUrl = $imageUrls[0];
+        // Fetch the image content from the URL
+        $imageContent = @file_get_contents($imageUrl);
+        if ($imageContent !== false) {
+            // Encode the image content in base64 with data URI prefix
+            $productImage = 'data:image/jpeg;base64,' . base64_encode($imageContent);
+        } else {
+            // Fallback to URL if image content cannot be fetched
+            $productImage = $imageUrl;
+        }
+    }
 
     // Mapper les données selon votre modèle Flutter
     $productData = [
