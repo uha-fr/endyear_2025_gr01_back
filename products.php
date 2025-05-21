@@ -146,7 +146,21 @@ function getProductDetails($productId) {
     }
 
 
-    $productImage = !empty($imageUrls) ? $imageUrls[0] : "http://localhost:8080/img/p/default-image.jpg"; // Fournir une image par défaut
+    $productImage = "";
+    if (!empty($imageUrls)) {
+        $imageUrl = $imageUrls[0];
+        // Fetch the image content from the URL
+        $imageContent = @file_get_contents($imageUrl);
+        if ($imageContent !== false) {
+            // Encode the image content in base64 with data URI prefix
+            $productImage = 'data:image/jpeg;base64,' . base64_encode($imageContent);
+        } else {
+            // Fallback to URL if image content cannot be fetched
+            $productImage = $imageUrl;
+        }
+    } else {
+        $productImage = "http://localhost:8080/img/p/default-image.jpg"; // Fournir une image par défaut
+    }
 
     // Extraire les noms et descriptions pour la langue par défaut (supposons ID 1 pour le français)
     $productName = "";
