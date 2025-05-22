@@ -201,6 +201,56 @@ if (isset($order->id_address_invoice) && !empty($order->id_address_invoice)) {
 }
 
 // Mapper les données selon le modèle OrderModel
+
+function getProductDetails($productId, $apiBaseUrl, $apiKey) {
+    $productApiUrl = "$apiBaseUrl/products/$productId";
+    $productApiResult = callPrestaShopApi($productApiUrl, $apiKey);
+
+    if ($productApiResult["error"] || $productApiResult["httpCode"] !== 200) {
+        return [
+            "product_name" => "",
+            "product_price" => 0.0
+        ];
+    }
+
+    $productXml = simplexml_load_string($productApiResult["response"]);
+    if (!$productXml) {
+        return [
+            "product_name" => "",
+            "product_price" => 0.0
+        ];
+    }
+
+    $productName = "";
+    $productPrice = 0.0;
+
+    if (isset($productXml->product->name->language)) {
+        $productName = (string)$productXml->product->name->language;
+    }
+
+    if (isset($productXml->product->price)) {
+        $productPrice = (float)$productXml->product->price;
+    }
+
+    return [
+        "product_name" => $productName,
+        "product_price" => $productPrice
+    ];
+}
+
+$products = [];
+if (isset($order->associations->order_rows->order_row)) {
+    foreach ($order->associations->order_rows->order_row as $orderRow) {
+        $productId = (int)$orderRow->product_id;
+        $productDetails = getProductDetails($productId, $apiBaseUrl, $apiKey);
+        $products[] = [
+            "product_id" => $productId,
+            "product_name" => $productDetails["product_name"],
+            "product_price" => $productDetails["product_price"]
+        ];
+    }
+}
+
 $orderData = [
     "id" => (int)$order->id,
     "reference" => (string)$order->reference,
@@ -217,7 +267,8 @@ $orderData = [
     "gift" => ((int)$order->gift == 1),
     "giftMessage" => (string)$order->gift_message,
     "deliveryAddress" => $deliveryAddress,
-    "invoiceAddress" => $invoiceAddress
+    "invoiceAddress" => $invoiceAddress,
+    "products" => $products
 ];
 
 // Réponse finale
