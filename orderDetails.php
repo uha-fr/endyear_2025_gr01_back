@@ -245,7 +245,8 @@ if (isset($order->associations->order_rows->order_row)) {
         $products[] = [
             "product_id" => $productId,
             "product_name" => $productDetails["product_name"],
-            "product_price" => $productDetails["product_price"]
+            "product_price" => $productDetails["product_price"],
+            "product_quantity" => (int)$orderRow->product_quantity
         ];
     }
 }
