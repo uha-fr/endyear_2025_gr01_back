@@ -1,4 +1,4 @@
 <?php
 // Configuration file for API settings
 $apiBaseUrl = "http://localhost:8080/api";
-$apiKey = "F5N97SP3ZEITM625SNC8IZ4ZV67K5PEH";
+$apiKey = "I8Y6179K6V47XT9G56Q434FW1EVSQP6X";
