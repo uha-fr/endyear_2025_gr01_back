@@ -5,9 +5,7 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
 
-// Configuration de l'API PrestaShop
-$apiBaseUrl = "http://localhost:8080/api"; // ou 10.0.2.2 si PrestaShop est en local sur Android Emulator
-$apiKey = "F5N97SP3ZEITM625SNC8IZ4ZV67K5PEH"; // Remplacez par votre clé API réelle
+include 'config.php';
 
 // Fonction pour appeler l'API PrestaShop
 function callPrestaShopApi($url, $apiKey) {

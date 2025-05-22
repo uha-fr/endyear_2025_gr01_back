@@ -4,6 +4,8 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
 
+include 'config.php';
+
 // Récupérer l'ID de la commande depuis la requête
 $orderId = isset($_GET['id']) ? intval($_GET['id']) : null;
 
@@ -14,10 +16,7 @@ if (!$orderId) {
     ]);
     exit;
 }
-
-// Configuration de l'API PrestaShop
-$apiBaseUrl = "http://localhost:8080/api";
-$apiKey = "I8Y6179K6V47XT9G56Q434FW1EVSQP6X";
+ 
 
 // Fonction pour appeler l'API PrestaShop
 function callPrestaShopApi($url, $apiKey) {
