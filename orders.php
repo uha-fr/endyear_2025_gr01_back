@@ -4,9 +4,8 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
 
-// Configuration de l'API PrestaShop
-$apiBaseUrl = "http://localhost:8080/api";
-$apiKey = "I8Y6179K6V47XT9G56Q434FW1EVSQP6X";
+ 
+include 'config.php';
 
 // Fonction pour appeler l'API PrestaShop
 function callPrestaShopApi($url, $apiKey, $format = "JSON") {
