@@ -137,13 +137,27 @@ function getProductDetails($productId) {
         }
     }
 
+    // Fetch stock available quantity for the product
+    $stockQuantity = 0;
+    $stockApiUrl = "$apiBaseUrl/stock_availables/$productId";
+    //echo ($stockApiUrl);
+    $stockApiResult = callPrestaShopApi($stockApiUrl, $apiKey);
+    if ($stockApiResult["httpCode"] === 200) {
+        $stockXml = simplexml_load_string($stockApiResult["response"]);
+       // echo json_encode($stockXml);
+        if ($stockXml && isset($stockXml->stock_available)) {
+            // Directly get the quantity from the single stock_available element
+            $stockQuantity = (int)$stockXml->stock_available->quantity;
+        }
+    }
+
     // Mapper les données selon votre modèle Flutter
     $productData = [
         "productId" => (int)$product->id,
         "productName" => (string)$product->name->language,
         "productDesc" => (string)$product->description->language,
         "productImage" => $productImage,
-        "productCount" => (int)$product->quantity,
+        "productCount" => $stockQuantity,
         "productActive" => ((int)$product->active == 1),
         "productPrice" => (float)$product->price,
         "productDate" => (string)$product->date_add,
