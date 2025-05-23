@@ -196,13 +196,26 @@ function getProductDetails($productId) {
         else if (isset($product->available_later->language[0])) $availableLater = (string)$product->available_later->language[0];
     }
 
-
+// Fetch stock available quantity for the product
+    $stockQuantity = 0;
+    $stockApiUrl = "$apiBaseUrl/stock_availables/$productId";
+    //echo ($stockApiUrl);
+    $stockApiResult = callPrestaShopApi($stockApiUrl, $apiKey);
+    if ($stockApiResult["httpCode"] === 200) {
+        $stockXml = simplexml_load_string($stockApiResult["response"]);
+       // echo json_encode($stockXml);
+        if ($stockXml && isset($stockXml->stock_available)) {
+            // Directly get the quantity from the single stock_available element
+            $stockQuantity = (int)$stockXml->stock_available->quantity;
+        }
+    }
+    
     $productData = [
         "productId" => (int)$product->id,
         "productName" => $productName,
         "productDesc" => $productDesc,
         "productImage" => $productImage,
-        "productCount" => isset($product->quantity) ? (int)$product->quantity : 0,
+        "productCount" => $stockQuantity,
         "productActive" => isset($product->active) ? ((int)$product->active == 1) : false,
         "productPrice" => isset($product->price) ? (float)$product->price : 0.0,
         "productDate" => isset($product->date_add) ? (string)$product->date_add : "",
