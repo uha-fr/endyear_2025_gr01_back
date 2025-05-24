@@ -143,6 +143,7 @@ foreach ($ordersData['orders'] as $orderItem) {
                     "id" => (int)$order['id'],
                     "reference" => $order['reference'],
                     "totalPaidTaxIncl" => (float)$order['total_paid_tax_incl'],
+                    "customerId" => isset($order['id_customer']) ? (int)$order['id_customer'] : null,
                     "customerName" => $customerName,
                     "currentStateName" => $orderStateName,
                     "dateAdd" => $order['date_add']
