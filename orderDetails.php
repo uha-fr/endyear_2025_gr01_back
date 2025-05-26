@@ -46,7 +46,7 @@ function callPrestaShopApi($url, $apiKey) {
 }
 
 // Appeler l'API pour obtenir les détails de la commande
-$orderApiUrl = "$apiBaseUrl/orders/$orderId";
+$orderApiUrl = "$apiBaseUrl/api/orders/$orderId";
 $orderApiResult = callPrestaShopApi($orderApiUrl, $apiKey);
 
 if ($orderApiResult["error"]) {
@@ -83,7 +83,7 @@ $order = $xml->order;
 $customerName = "";
 if (isset($order->id_customer) && !empty($order->id_customer)) {
     $customerId = (int)$order->id_customer;
-    $customerApiUrl = "$apiBaseUrl/customers/$customerId";
+    $customerApiUrl = "$apiBaseUrl/api/customers/$customerId";
     
     $customerApiResult = callPrestaShopApi($customerApiUrl, $apiKey);
     
@@ -101,7 +101,7 @@ if (isset($order->id_customer) && !empty($order->id_customer)) {
 $orderStateName = "";
 if (isset($order->current_state) && !empty($order->current_state)) {
     $orderStateId = (int)$order->current_state;
-    $orderStateApiUrl = "$apiBaseUrl/order_states/$orderStateId";
+    $orderStateApiUrl = "$apiBaseUrl/api/order_states/$orderStateId";
     
     $orderStateApiResult = callPrestaShopApi($orderStateApiUrl, $apiKey);
     
@@ -117,7 +117,7 @@ if (isset($order->current_state) && !empty($order->current_state)) {
 $deliveryAddress = null;
 if (isset($order->id_address_delivery) && !empty($order->id_address_delivery)) {
     $deliveryAddressId = (int)$order->id_address_delivery;
-    $addressApiUrl = "$apiBaseUrl/addresses/$deliveryAddressId";
+    $addressApiUrl = "$apiBaseUrl/api/addresses/$deliveryAddressId";
     
     $addressApiResult = callPrestaShopApi($addressApiUrl, $apiKey);
     
@@ -130,7 +130,7 @@ if (isset($order->id_address_delivery) && !empty($order->id_address_delivery)) {
             $countryName = "";
             if (isset($address->id_country) && !empty($address->id_country)) {
                 $countryId = (int)$address->id_country;
-                $countryApiUrl = "$apiBaseUrl/countries/$countryId";
+                $countryApiUrl = "$apiBaseUrl/api/countries/$countryId";
                 
                 $countryApiResult = callPrestaShopApi($countryApiUrl, $apiKey);
                 
@@ -160,7 +160,7 @@ if (isset($order->id_address_invoice) && !empty($order->id_address_invoice)) {
     
     // Si l'adresse de facturation est différente de l'adresse de livraison
     if ($invoiceAddressId != (int)$order->id_address_delivery) {
-        $addressApiUrl = "$apiBaseUrl/addresses/$invoiceAddressId";
+        $addressApiUrl = "$apiBaseUrl/api/addresses/$invoiceAddressId";
         $addressApiResult = callPrestaShopApi($addressApiUrl, $apiKey);
         
         if (!$addressApiResult["error"] && $addressApiResult["httpCode"] === 200) {
@@ -172,7 +172,7 @@ if (isset($order->id_address_invoice) && !empty($order->id_address_invoice)) {
                 $countryName = "";
                 if (isset($address->id_country) && !empty($address->id_country)) {
                     $countryId = (int)$address->id_country;
-                    $countryApiUrl = "$apiBaseUrl/countries/$countryId";
+                    $countryApiUrl = "$apiBaseUrl/api/countries/$countryId";
                     
                     $countryApiResult = callPrestaShopApi($countryApiUrl, $apiKey);
                     
@@ -202,7 +202,7 @@ if (isset($order->id_address_invoice) && !empty($order->id_address_invoice)) {
 // Mapper les données selon le modèle OrderModel
 
 function getProductDetails($productId, $apiBaseUrl, $apiKey) {
-    $productApiUrl = "$apiBaseUrl/products/$productId";
+    $productApiUrl = "$apiBaseUrl/api/products/$productId";
     $productApiResult = callPrestaShopApi($productApiUrl, $apiKey);
 
     if ($productApiResult["error"] || $productApiResult["httpCode"] !== 200) {

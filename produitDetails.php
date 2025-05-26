@@ -44,7 +44,7 @@ function getProductDetails($productId) {
     }
 
     // Appeler l'API pour obtenir les détails du produit
-    $productApiUrl = "$apiBaseUrl/products/$productId";
+    $productApiUrl = "$apiBaseUrl/api/products/$productId";
     $productApiResult = callPrestaShopApi($productApiUrl, $apiKey);
 
     if ($productApiResult["error"]) {
@@ -78,7 +78,7 @@ function getProductDetails($productId) {
     $manufacturerName = "";
     if (isset($product->id_manufacturer) && !empty($product->id_manufacturer)) {
         $manufacturerId = (int)$product->id_manufacturer;
-        $manufacturerApiUrl = "$apiBaseUrl/manufacturers/$manufacturerId";
+        $manufacturerApiUrl = "$apiBaseUrl/api/manufacturers/$manufacturerId";
         
         $manufacturerApiResult = callPrestaShopApi($manufacturerApiUrl, $apiKey);
         
@@ -96,7 +96,7 @@ function getProductDetails($productId) {
     $categoryDatetime = "";
     if (isset($product->id_category_default) && !empty($product->id_category_default)) {
         $categoryId = (int)$product->id_category_default;
-        $categoryApiUrl = "$apiBaseUrl/categories/$categoryId";
+        $categoryApiUrl = "$apiBaseUrl/api/categories/$categoryId";
         
         $categoryApiResult = callPrestaShopApi($categoryApiUrl, $apiKey);
         
@@ -117,7 +117,7 @@ function getProductDetails($productId) {
     if (isset($xml->product->associations->images->image)) {
         foreach ($xml->product->associations->images->image as $image) {
             $imageId = (int)$image->id;
-            $imageUrl = "http://localhost:8080/img/p/" . implode('/', str_split((string)$imageId)) . "/$imageId.jpg";
+            $imageUrl = "$apiBaseUrl/img/p/" . implode('/', str_split((string)$imageId)) . "/$imageId.jpg";
             $imageUrls[] = $imageUrl;
         }
     }
@@ -139,7 +139,7 @@ function getProductDetails($productId) {
 
     // Fetch stock available quantity for the product
     $stockQuantity = 0;
-    $stockApiUrl = "$apiBaseUrl/stock_availables/$productId";
+    $stockApiUrl = "$apiBaseUrl/api/stock_availables/$productId";
     //echo ($stockApiUrl);
     $stockApiResult = callPrestaShopApi($stockApiUrl, $apiKey);
     if ($stockApiResult["httpCode"] === 200) {

@@ -45,7 +45,7 @@ function callPrestaShopApi($url, $apiKey, $format = "XML") {
 }
 
 // Appeler l'API pour obtenir les détails du client
-$customerApiUrl = "$apiBaseUrl/customers/$customerId";
+$customerApiUrl = "$apiBaseUrl/api/customers/$customerId";
 $customerApiResult = callPrestaShopApi($customerApiUrl, $apiKey);
 
 if ($customerApiResult["error"]) {

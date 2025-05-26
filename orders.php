@@ -35,7 +35,7 @@ function callPrestaShopApi($url, $apiKey, $format = "JSON") {
 }
 
 // Récupérer la liste des commandes
-$ordersApiUrl = "$apiBaseUrl/orders";
+$ordersApiUrl = "$apiBaseUrl/api/orders";
 $ordersApiResult = callPrestaShopApi($ordersApiUrl, $apiKey);
 
 if ($ordersApiResult["error"]) {
@@ -77,7 +77,7 @@ foreach ($ordersData['orders'] as $orderItem) {
     // Si c'est juste une référence à une commande, récupérer les détails
     if (isset($orderItem['id'])) {
         $orderId = $orderItem['id'];
-        $orderDetailUrl = "$apiBaseUrl/orders/$orderId";
+        $orderDetailUrl = "$apiBaseUrl/api/orders/$orderId";
         $orderDetailResult = callPrestaShopApi($orderDetailUrl, $apiKey);
         
         if (!$orderDetailResult["error"] && $orderDetailResult["httpCode"] === 200) {
@@ -95,7 +95,7 @@ foreach ($ordersData['orders'] as $orderItem) {
                     if (isset($customerCache[$customerId])) {
                         $customerName = $customerCache[$customerId];
                     } else {
-                        $customerApiUrl = "$apiBaseUrl/customers/$customerId";
+                        $customerApiUrl = "$apiBaseUrl/api/customers/$customerId";
                         $customerApiResult = callPrestaShopApi($customerApiUrl, $apiKey);
                         
                         if (!$customerApiResult["error"] && $customerApiResult["httpCode"] === 200) {
@@ -121,7 +121,7 @@ foreach ($ordersData['orders'] as $orderItem) {
                     if (isset($orderStateCache[$orderStateId])) {
                         $orderStateName = $orderStateCache[$orderStateId];
                     } else {
-                        $orderStateApiUrl = "$apiBaseUrl/order_states/$orderStateId";
+                        $orderStateApiUrl = "$apiBaseUrl/api/order_states/$orderStateId";
                         // Pour le statut de commande, utiliser XML qui est plus facile à parser pour les langues
                         $orderStateApiResult = callPrestaShopApi($orderStateApiUrl, $apiKey, "XML");
                         

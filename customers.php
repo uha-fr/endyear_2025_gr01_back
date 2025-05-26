@@ -34,7 +34,7 @@ function callPrestaShopApi($url, $apiKey, $format = "JSON") {
 }
 
 // Call PrestaShop API to get list of customers (only IDs)
-$customersApiUrl = "$apiBaseUrl/customers";
+$customersApiUrl = "$apiBaseUrl/api/customers";
 $customersApiResult = callPrestaShopApi($customersApiUrl, $apiKey);
 
 if ($customersApiResult["error"]) {
@@ -73,7 +73,7 @@ foreach ($customersData['customers'] as $customer) {
         continue;
     }
 
-    $customerDetailUrl = "$apiBaseUrl/customers/$id";
+    $customerDetailUrl = "$apiBaseUrl/api/customers/$id";
     $customerDetailResult = callPrestaShopApi($customerDetailUrl, $apiKey, "XML");
 
     if ($customerDetailResult["error"] || $customerDetailResult["httpCode"] !== 200) {

@@ -67,7 +67,7 @@ function getAllProductDetails() {
 
     // 1. Obtenir la liste de tous les ID de produits
     // On demande seulement les IDs pour alléger la première requête
-    $productsListUrl = "$apiBaseUrl/products?display=[id]"; 
+    $productsListUrl = "$apiBaseUrl/api/products?display=[id]"; 
     $productListResult = callPrestaShopApi($productsListUrl, $apiKey);
 
     if ($productListResult["error"]) {
