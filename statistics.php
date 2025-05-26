@@ -34,7 +34,7 @@ function callPrestaShopApi($url, $apiKey, $format = "JSON") {
 }
 
 // Fetch all orders
-$ordersApiUrl = "$apiBaseUrl/orders";
+$ordersApiUrl = "$apiBaseUrl/api/orders";
 $ordersApiResult = callPrestaShopApi($ordersApiUrl, $apiKey);
 
 if ($ordersApiResult["error"] || $ordersApiResult["httpCode"] !== 200) {
@@ -56,7 +56,7 @@ if (!isset($ordersData['orders']) || !is_array($ordersData['orders'])) {
 }
 
 // Fetch all customers
-$customersApiUrl = "$apiBaseUrl/customers";
+$customersApiUrl = "$apiBaseUrl/api/customers";
 $customersApiResult = callPrestaShopApi($customersApiUrl, $apiKey);
 
 if ($customersApiResult["error"] || $customersApiResult["httpCode"] !== 200) {
@@ -84,7 +84,7 @@ foreach ($customersData['customers'] as $customer) {
     if ($id === null) continue;
 
     // Fetch detailed customer info (date_add) via XML
-    $customerDetailUrl = "$apiBaseUrl/customers/$id";
+    $customerDetailUrl = "$apiBaseUrl/api/customers/$id";
     $customerDetailResult = callPrestaShopApi($customerDetailUrl, $apiKey, "XML");
     if ($customerDetailResult["error"] || $customerDetailResult["httpCode"] !== 200) continue;
 
@@ -110,7 +110,7 @@ $productSales = []; // product_id => ['quantity' => int, 'revenue' => float, 'na
 
 // Helper function to fetch order details and products
 function getOrderDetails($orderId, $apiBaseUrl, $apiKey) {
-    $url = "$apiBaseUrl/orders/$orderId";
+    $url = "$apiBaseUrl/api/orders/$orderId";
     $result = callPrestaShopApi($url, $apiKey, "XML");
     if ($result["error"] || $result["httpCode"] !== 200) return null;
 
@@ -128,7 +128,7 @@ function getOrderDetails($orderId, $apiBaseUrl, $apiKey) {
             $productName = "";
 
             // Fetch product name
-            $productApiUrl = "$apiBaseUrl/products/$productId";
+            $productApiUrl = "$apiBaseUrl/api/products/$productId";
             $productApiResult = callPrestaShopApi($productApiUrl, $apiKey, "XML");
             if (!$productApiResult["error"] && $productApiResult["httpCode"] === 200) {
                 $productXml = simplexml_load_string($productApiResult["response"]);
@@ -155,7 +155,7 @@ foreach ($ordersData['orders'] as $orderItem) {
     $orderId = $orderItem['id'];
 
     // Fetch detailed order info
-    $orderDetailUrl = "$apiBaseUrl/orders/$orderId";
+    $orderDetailUrl = "$apiBaseUrl/api/orders/$orderId";
     $orderDetailResult = callPrestaShopApi($orderDetailUrl, $apiKey);
     if ($orderDetailResult["error"] || $orderDetailResult["httpCode"] !== 200) continue;
 
@@ -227,7 +227,7 @@ $repeatCustomerRate = $totalCustomers > 0 ? ($repeatCustomers / $totalCustomers)
 // Prepare order status names by fetching from API
 $orderStateNames = [];
 foreach (array_keys($orderStatusCounts) as $stateId) {
-    $stateApiUrl = "$apiBaseUrl/order_states/$stateId";
+    $stateApiUrl = "$apiBaseUrl/api/order_states/$stateId";
     $stateApiResult = callPrestaShopApi($stateApiUrl, $apiKey, "XML");
     if (!$stateApiResult["error"] && $stateApiResult["httpCode"] === 200) {
         $stateXml = simplexml_load_string($stateApiResult["response"]);
