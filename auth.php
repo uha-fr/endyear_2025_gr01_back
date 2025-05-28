@@ -15,35 +15,68 @@ if (!isset($input['email']) || !isset($input['password'])) {
 $email = $input['email'];
 $password = $input['password'];
 
-// Function to fetch all employees from the external API
 function fetchEmployees($apiBaseUrl, $apiKey) {
-    $url = $apiBaseUrl . '/api/employees/?output_format=JSON';
+    $url = $apiBaseUrl . '/api/employees/';
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    // If API key is needed in headers or query, add here
-    // curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $apiKey]);
+    // Use HTTP Basic Auth with API key as username and empty password
+    curl_setopt($ch, CURLOPT_USERPWD, $apiKey . ':');
     $response = curl_exec($ch);
     if (curl_errno($ch)) {
+        error_log('cURL error in fetchEmployees: ' . curl_error($ch));
         curl_close($ch);
         return null;
     }
     curl_close($ch);
-    return json_decode($response, true);
+    // Parse XML response
+    $xml = simplexml_load_string($response);
+    if ($xml === false) {
+        error_log('Failed to parse XML in fetchEmployees');
+        return null;
+    }
+    // Convert XML to array of employee IDs
+    $employees = [];
+    if (isset($xml->employees->employee)) {
+        foreach ($xml->employees->employee as $emp) {
+            $attributes = $emp->attributes('xlink', true);
+            if ($attributes && isset($attributes['href'])) {
+                // Extract ID from href URL
+                $href = (string)$attributes['href'];
+                preg_match('/\/api\/employees\/(\d+)/', $href, $matches);
+                if (isset($matches[1])) {
+                    $employees[] = ['id' => $matches[1]];
+                }
+            }
+        }
+    }
+    return ['employees' => $employees];
 }
 
-// Function to fetch employee details by ID
 function fetchEmployeeById($apiBaseUrl, $apiKey, $id) {
-    $url = $apiBaseUrl . '/api/employees/' . $id . '/?output_format=JSON';
+    $url = $apiBaseUrl . '/api/employees/' . $id;
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    // curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $apiKey]);
+    // Use HTTP Basic Auth with API key as username and empty password
+    curl_setopt($ch, CURLOPT_USERPWD, $apiKey . ':');
     $response = curl_exec($ch);
     if (curl_errno($ch)) {
+        error_log('cURL error in fetchEmployeeById: ' . curl_error($ch));
         curl_close($ch);
         return null;
     }
     curl_close($ch);
-    return json_decode($response, true);
+    // Parse XML response
+    $xml = simplexml_load_string($response);
+    if ($xml === false || !isset($xml->employee)) {
+        error_log('Failed to parse XML or missing employee in fetchEmployeeById');
+        return null;
+    }
+    // Convert XML employee data to associative array
+    $employee = [];
+    foreach ($xml->employee->children() as $child) {
+        $employee[$child->getName()] = (string)$child;
+    }
+    return ['employee' => $employee];
 }
 
 // Fetch all employees
