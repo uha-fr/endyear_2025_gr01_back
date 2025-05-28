@@ -1,7 +1,24 @@
 <?php
 header('Content-Type: application/json');
 
+// Add CORS headers
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+} else {
+    header("Access-Control-Allow-Origin: *");
+}
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    // Handle preflight request
+    http_response_code(200);
+    exit;
+}
+
 require_once 'config.php';
+
 
 // Get the raw POST data
 $input = json_decode(file_get_contents('php://input'), true);
