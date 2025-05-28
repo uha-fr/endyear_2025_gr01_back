@@ -91,11 +91,28 @@ foreach ($customersData['customers'] as $customer) {
     $lastname = isset($customerNode->lastname) ? (string)$customerNode->lastname : "";
     $dateAdd = isset($customerNode->date_add) ? (string)$customerNode->date_add : "";
 
+    // Fetch orders for this customer to get order IDs
+    $ordersApiUrlForCustomer = "$apiBaseUrl/api/orders?filter[id_customer]=$id";
+    $ordersApiResultForCustomer = callPrestaShopApi($ordersApiUrlForCustomer, $apiKey);
+
+    $orderIds = [];
+    if (!$ordersApiResultForCustomer["error"] && $ordersApiResultForCustomer["httpCode"] === 200) {
+        $ordersDataForCustomer = json_decode($ordersApiResultForCustomer["response"], true);
+        if (isset($ordersDataForCustomer['orders']) && is_array($ordersDataForCustomer['orders'])) {
+            foreach ($ordersDataForCustomer['orders'] as $order) {
+                if (isset($order['id'])) {
+                    $orderIds[] = intval($order['id']);
+                }
+            }
+        }
+    }
+
     $customersList[] = [
         "id" => $id,
         "firstname" => $firstname,
         "lastname" => $lastname,
-        "date_add" => $dateAdd
+        "date_add" => $dateAdd,
+        "order_ids" => $orderIds
     ];
 }
 
