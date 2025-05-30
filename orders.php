@@ -153,6 +153,118 @@ foreach ($ordersData['orders'] as $orderItem) {
     }
 }
 
+// Handle POST request to update currentStateName of an order with orderId in URL path
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Extract orderId from URL path
+    $requestUri = $_SERVER['REQUEST_URI'];
+    $scriptName = $_SERVER['SCRIPT_NAME'];
+    $path = substr($requestUri, strlen($scriptName));
+    $path = trim($path, '/');
+    $orderIdFromPath = null;
+    if (!empty($path)) {
+        $parts = explode('/', $path);
+        $orderIdFromPath = intval($parts[0]);
+    }
+
+    if (!$orderIdFromPath) {
+        echo json_encode([
+            "success" => false,
+            "error" => "Missing orderId in URL path"
+        ]);
+        exit;
+    }
+
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!isset($input['newStateId'])) {
+        echo json_encode([
+            "success" => false,
+            "error" => "Missing newStateId in request body"
+        ]);
+        exit;
+    }
+
+    $orderId = $orderIdFromPath;
+    $newStateId = intval($input['newStateId']);
+
+    // Get current order data
+    $orderDetailUrl = "$apiBaseUrl/api/orders/$orderId";
+    $orderDetailResult = callPrestaShopApi($orderDetailUrl, $apiKey);
+
+    if ($orderDetailResult["error"] || $orderDetailResult["httpCode"] !== 200) {
+        echo json_encode([
+            "success" => false,
+            "error" => "Failed to fetch order details",
+            "details" => $orderDetailResult["response"]
+        ]);
+        exit;
+    }
+
+    $orderDetail = json_decode($orderDetailResult["response"], true);
+    if (!isset($orderDetail['order'])) {
+        echo json_encode([
+            "success" => false,
+            "error" => "Order data not found"
+        ]);
+        exit;
+    }
+
+    $order = $orderDetail['order'];
+    // Update current_state
+    $order['current_state'] = $newStateId;
+
+    // Prepare XML payload for update (PrestaShop API expects XML for updates)
+    $xml = new SimpleXMLElement('<prestashop/>');
+    $orderXml = $xml->addChild('order');
+    foreach ($order as $key => $value) {
+        // Only add scalar values to XML
+        if (is_scalar($value)) {
+            $orderXml->addChild($key, htmlspecialchars($value));
+        }
+    }
+    $xmlPayload = $xml->asXML();
+
+    // Initialize cURL for PUT request
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => $orderDetailUrl,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => "PUT",
+        CURLOPT_USERPWD => "$apiKey:",
+        CURLOPT_HTTPHEADER => array(
+            "Content-Type: application/xml",
+            "Content-Length: " . strlen($xmlPayload)
+        ),
+        CURLOPT_POSTFIELDS => $xmlPayload
+    ));
+
+    $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $error = curl_errno($curl) ? curl_error($curl) : null;
+    curl_close($curl);
+
+    if ($error) {
+        echo json_encode([
+            "success" => false,
+            "error" => $error
+        ]);
+        exit;
+    }
+
+    if ($httpCode >= 200 && $httpCode < 300) {
+        echo json_encode([
+            "success" => true,
+            "message" => "Order state updated successfully"
+        ]);
+    } else {
+        echo json_encode([
+            "success" => false,
+            "httpCode" => $httpCode,
+            "response" => $response
+        ]);
+    }
+    exit;
+}
+
 // Réponse finale
 echo json_encode([
     "success" => true,
