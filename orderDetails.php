@@ -257,6 +257,7 @@ $orderData = [
     "idCustomer" => (int)$order->id_customer,
     "customerName" => $customerName,
     "currentStateName" => $orderStateName,
+    "current_state" => isset($order->current_state) ? (int)$order->current_state : null,
     "payment" => (string)$order->payment,
     "module" => (string)$order->module,
     "totalPaidTaxIncl" => (float)$order->total_paid_tax_incl,
