@@ -146,6 +146,7 @@ foreach ($ordersData['orders'] as $orderItem) {
                     "customerId" => isset($order['id_customer']) ? (int)$order['id_customer'] : null,
                     "customerName" => $customerName,
                     "currentStateName" => $orderStateName,
+                    "current_state" => isset($order['current_state']) ? (int)$order['current_state'] : null,
                     "dateAdd" => $order['date_add']
                 ];
             }
