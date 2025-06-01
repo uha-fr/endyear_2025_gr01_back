@@ -78,7 +78,78 @@ if (!$customerXml) {
 // Extraire les données du client
 $customerData = $customerXml->customer;
 
-// Appeler l'API locale orders.php pour obtenir la liste des commandes
+function getCountryName($countryId, $apiBaseUrl, $apiKey) {
+    $countryApiUrl = "$apiBaseUrl/api/countries/$countryId";
+    $countryApiResult = callPrestaShopApi($countryApiUrl, $apiKey);
+
+    if ($countryApiResult["error"] || $countryApiResult["httpCode"] !== 200) {
+        return "";
+    }
+
+    $countryXml = simplexml_load_string($countryApiResult["response"]);
+    if (!$countryXml || !isset($countryXml->country->name->language)) {
+        return "";
+    }
+
+    return (string)$countryXml->country->name->language;
+}
+
+function getAllAddresses($apiBaseUrl, $apiKey) {
+    $addressesApiUrl = "$apiBaseUrl/api/addresses";
+    $addressesApiResult = callPrestaShopApi($addressesApiUrl, $apiKey);
+
+    if ($addressesApiResult["error"] || $addressesApiResult["httpCode"] !== 200) {
+        return [];
+    }
+
+    $addressesXml = simplexml_load_string($addressesApiResult["response"]);
+    if (!$addressesXml || !isset($addressesXml->addresses->address)) {
+        return [];
+    }
+
+    $addresses = [];
+    foreach ($addressesXml->addresses->address as $address) {
+        $addresses[] = [
+            "id" => (int)$address['id'],
+            "href" => (string)$address['xlink:href']
+        ];
+    }
+    return $addresses;
+}
+
+function getAddressDetails($addressId, $apiBaseUrl, $apiKey) {
+    $addressApiUrl = "$apiBaseUrl/api/addresses/$addressId";
+    $addressApiResult = callPrestaShopApi($addressApiUrl, $apiKey);
+
+    if ($addressApiResult["error"] || $addressApiResult["httpCode"] !== 200) {
+        return null;
+    }
+
+    $addressXml = simplexml_load_string($addressApiResult["response"]);
+    if (!$addressXml || !isset($addressXml->address)) {
+        return null;
+    }
+
+    $address = $addressXml->address;
+
+    $countryName = "";
+    if (isset($address->id_country) && !empty($address->id_country)) {
+        $countryName = getCountryName((int)$address->id_country, $apiBaseUrl, $apiKey);
+    }
+
+    return [
+        "id" => (int)$address->id,
+        "alias" => (string)$address->alias,
+        "address1" => (string)$address->address1,
+        "address2" => (string)$address->address2,
+        "postcode" => (string)$address->postcode,
+        "city" => (string)$address->city,
+        "country" => $countryName,
+        "phone" => (string)$address->phone,
+        "phone_mobile" => (string)$address->phone_mobile
+    ];
+}
+
 $ordersApiUrl = "http://localhost/xampp/endyear_2025_gr01_back/orders.php";
 $ordersApiResult = callPrestaShopApi($ordersApiUrl, $apiKey, "JSON");
 
@@ -118,6 +189,31 @@ foreach ($ordersData['orders'] as $orderItem) {
     }
 }
 
+// Get all addresses
+$allAddresses = getAllAddresses($apiBaseUrl, $apiKey);
+
+// Filter addresses for current customer
+$customerAddresses = [];
+foreach ($allAddresses as $addr) {
+    $addressDetails = getAddressDetails($addr['id'], $apiBaseUrl, $apiKey);
+    if ($addressDetails && isset($addressDetails['id'])) {
+        // Check if address belongs to current customer
+        $addressApiUrl = "$apiBaseUrl/api/addresses/" . $addressDetails['id'];
+        $addressApiResult = callPrestaShopApi($addressApiUrl, $apiKey);
+        if ($addressApiResult["error"] || $addressApiResult["httpCode"] !== 200) {
+            continue;
+        }
+        $addressXml = simplexml_load_string($addressApiResult["response"]);
+        if (!$addressXml || !isset($addressXml->address->id_customer)) {
+            continue;
+        }
+        $idCustomerInAddress = (int)$addressXml->address->id_customer;
+        if ($idCustomerInAddress === $customerId) {
+            $customerAddresses[] = $addressDetails;
+        }
+    }
+}
+
 // Réponse finale
 echo json_encode([
     "success" => true,
@@ -126,11 +222,12 @@ echo json_encode([
         "lastname" => (string)$customerData->lastname,
         "firstname" => (string)$customerData->firstname,
         "email" => (string)$customerData->email,
-    "gender" => (intval($customerData->id_gender) === 1) ? "Homme" : ((intval($customerData->id_gender) === 2) ? "femme" : "unknown"),
+        "gender" => (intval($customerData->id_gender) === 1) ? "Homme" : ((intval($customerData->id_gender) === 2) ? "femme" : "unknown"),
         "birthday" => (string)$customerData->birthday,
         "active" => intval($customerData->active),
         "date_add" => (string)$customerData->date_add,
-        "date_upd" => (string)$customerData->date_upd
+        "date_upd" => (string)$customerData->date_upd,
+        "addresses" => $customerAddresses
     ],
     "order_ids" => $customerOrderIds
 ]);
