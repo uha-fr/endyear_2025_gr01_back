@@ -146,7 +146,6 @@ function getAddressDetails($addressId, $apiBaseUrl, $apiKey) {
         "city" => (string)$address->city,
         "country" => $countryName,
         "phone" => (string)$address->phone,
-        "phone_mobile" => (string)$address->phone_mobile
     ];
 }
 
