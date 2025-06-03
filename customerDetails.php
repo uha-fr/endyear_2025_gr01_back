@@ -149,7 +149,7 @@ function getAddressDetails($addressId, $apiBaseUrl, $apiKey) {
     ];
 }
 
-$ordersApiUrl = "http://localhost/xampp/endyear_2025_gr01_back/orders.php";
+$ordersApiUrl = "$apiBaseUrl:8080/endyear_2025_gr01_back/orders.php";
 $ordersApiResult = callPrestaShopApi($ordersApiUrl, $apiKey, "JSON");
 
 if ($ordersApiResult["error"]) {
