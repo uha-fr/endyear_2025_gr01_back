@@ -22,9 +22,14 @@ jobs:
 
       - name: Deploy over SSH
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd /var/www/api-backend/endyear_2025_gr01_back
-            sudo git config --global --add safe.directory /var/www/api-backend/endyear_2025_gr01_back
-            sudo git pull origin main
+            pwd
+            whoami
+            git status
+            ls -la
+            git reset --hard
+            git clean -fd
+            git pull origin main
             sudo systemctl restart apache2
           EOF
