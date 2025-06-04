@@ -16,8 +16,7 @@ function getProductDetails($productId) {
         ];
     }
 
-    $url = "http://localhost/xampp/endyear_2025_gr01_back/produitDetails.php?id=" . urlencode($productId);
-
+    $url = "http://46.226.104.158:8080/endyear_2025_gr01_back/produitDetails.php?id=" . urlencode($productId);
     $curl = curl_init();
     curl_setopt_array($curl, array(
         CURLOPT_URL => $url,
