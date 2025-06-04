@@ -23,6 +23,7 @@ jobs:
       - name: Deploy via SSH
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+            git config --global --add safe.directory /var/www/api-backend/endyear_2025_gr01_back
             cd ${{ secrets.SSH_PATH }}
             git pull origin main
             sudo systemctl restart apache2
