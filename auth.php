@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-// the 4th test
+// the 5th test
 // Add CORS headers
 if (isset($_SERVER['HTTP_ORIGIN'])) {
     header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
