@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up SSH
@@ -20,11 +20,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy via SSH
+      - name: Deploy over SSH
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
-            git config --global --add safe.directory /var/www/api-backend/endyear_2025_gr01_back
-            cd ${{ secrets.SSH_PATH }}
-            git pull origin main
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd /var/www/api-backend/endyear_2025_gr01_back
+            sudo git config --global --add safe.directory /var/www/api-backend/endyear_2025_gr01_back
+            sudo git pull origin main
             sudo systemctl restart apache2
           EOF
