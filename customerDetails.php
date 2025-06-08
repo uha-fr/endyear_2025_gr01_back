@@ -221,7 +221,7 @@ echo json_encode([
         "lastname" => (string)$customerData->lastname,
         "firstname" => (string)$customerData->firstname,
         "email" => (string)$customerData->email,
-        "gender" => (intval($customerData->id_gender) === 1) ? "Homme" : ((intval($customerData->id_gender) === 2) ? "femme" : "unknown"),
+        "gender" => (intval($customerData->id_gender) === 1) ? "Homme" : ((intval($customerData->id_gender) === 2) ? "Femme" : "unknown"),
         "birthday" => (string)$customerData->birthday,
         "active" => intval($customerData->active),
         "date_add" => (string)$customerData->date_add,

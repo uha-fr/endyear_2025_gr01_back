@@ -91,7 +91,7 @@ foreach ($customersData['customers'] as $customer) {
     $lastname = isset($customerNode->lastname) ? (string)$customerNode->lastname : "";
     $dateAdd = isset($customerNode->date_add) ? (string)$customerNode->date_add : "";
     $genderId = isset($customerNode->id_gender) ? intval($customerNode->id_gender) : 0;
-    $gender = ($genderId === 1) ? "Homme" : (($genderId === 2) ? "femme" : "unknown");
+    $gender = ($genderId === 1) ? "Homme" : (($genderId === 2) ? "Femme" : "unknown");
 
     // Fetch orders for this customer to get order IDs
     $ordersApiUrlForCustomer = "$apiBaseUrl/api/orders?filter[id_customer]=$id";
