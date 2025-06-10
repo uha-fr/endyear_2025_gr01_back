@@ -218,6 +218,7 @@ echo json_encode([
     "success" => true,
     "customer" => [
         "id" => intval($customerData->id),
+        "civility" => match (intval($customerData->id_gender)) {1 => "Mr", 2 => "Mme", default => ""},
         "lastname" => (string)$customerData->lastname,
         "firstname" => (string)$customerData->firstname,
         "email" => (string)$customerData->email,
